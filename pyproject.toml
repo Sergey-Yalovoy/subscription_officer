@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "subscription-officer"
+version = "0.1.0"
+description = ""
+authors = ["sergey_yalovoy <sergeyyolovoi@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.104.1"
+pydantic-settings = "^2.0.3"
+sqlalchemy = "^2.0.23"
+alembic = "^1.12.1"
+strawberry-graphql = {extras = ["debug-server"], version = "^0.211.2"}
+fastapi-users = {extras = ["sqlalchemy"], version = "^12.1.2"}
+aiosqlite = "^0.19.0"
+black = "^23.11.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
