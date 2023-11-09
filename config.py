@@ -17,7 +17,7 @@ class DbSettings(BaseModel):
 
 class Settings(BaseSettings):
     db: DbSettings = DbSettings()
-    secret: str = 'secret'
+    secret: str = "secret"
 
 
 settings = Settings()

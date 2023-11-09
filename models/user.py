@@ -11,12 +11,13 @@ from .base_model import Base, BaseDBMixin
 
 if typing.TYPE_CHECKING:
     from .area import Area
+    from .chat import Chat, Message
 
 
 class UserRole(Enum):
-    manager: str = 'Manager'
-    client: str = 'Client'
-    worker: str = 'Worker'
+    manager: str = "Manager"
+    client: str = "Client"
+    worker: str = "Worker"
 
 
 class Sex(Enum):
@@ -31,7 +32,15 @@ class User(BaseDBMixin, SQLAlchemyBaseUserTable[int], Base):
     phone_number: Mapped[str | None] = mapped_column(String(50))
     sex: Mapped[Sex] = mapped_column(String(20))
     birth_date: Mapped[datetime.date | None]
-    areas: Mapped[typing.List["Area"]] = relationship(back_populates="user")
+    areas: Mapped[typing.List[typing.Optional["Area"]]] = relationship(
+        back_populates="user"
+    )
+    chats: Mapped[typing.List[typing.Optional["Chat"]]] = relationship(
+        secondary="association_chat_members", back_populates="chat_members"
+    )
+    author_messages: Mapped[typing.List[typing.Optional["Message"]]] = relationship(
+        back_populates="author"
+    )
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):

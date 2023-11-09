@@ -16,11 +16,11 @@ class Area(BaseDBMixin, Base):
     longtitude: Mapped[Decimal] = mapped_column(DECIMAL(precision=6))
     address: Mapped[str] = mapped_column(String(200))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    user: Mapped["User"] = relationship(back_populates='areas')
-    rooms: Mapped[typing.List["Room"]] = relationship(back_populates='area')
+    user: Mapped["User"] = relationship(back_populates="areas")
+    rooms: Mapped[typing.List["Room"] | None] = relationship(back_populates="area")
 
 
 class Room(BaseDBMixin, Base):
     name: Mapped[str] = mapped_column(String(100))
     area_id: Mapped[int] = mapped_column(ForeignKey("area.id"))
-    area: Mapped["Area"] = relationship(back_populates='rooms')
+    area: Mapped["Area"] = relationship(back_populates="rooms")
