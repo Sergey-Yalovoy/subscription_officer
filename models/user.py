@@ -8,10 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.session import get_async_session
 from .base_model import Base, BaseDBMixin
-
-if typing.TYPE_CHECKING:
-    from .area import Area
-    from .chat import Chat, Message
+from .area import Area
+from .chat import Chat, Message
 
 
 class UserRole(Enum):
@@ -30,15 +28,13 @@ class User(BaseDBMixin, SQLAlchemyBaseUserTable[int], Base):
     first_name: Mapped[str | None] = mapped_column(String(50))
     last_name: Mapped[str | None] = mapped_column(String(50))
     phone_number: Mapped[str | None] = mapped_column(String(50))
-    sex: Mapped[Sex] = mapped_column(String(20))
+    sex: Mapped[Sex | None] = mapped_column(String(20))
     birth_date: Mapped[datetime.date | None]
-    areas: Mapped[typing.List[typing.Optional["Area"]]] = relationship(
-        back_populates="user"
-    )
-    chats: Mapped[typing.List[typing.Optional["Chat"]]] = relationship(
+    areas: Mapped[typing.List["Area"]] = relationship(back_populates="user")
+    chats: Mapped[typing.List["Chat"]] = relationship(
         secondary="association_chat_members", back_populates="chat_members"
     )
-    author_messages: Mapped[typing.List[typing.Optional["Message"]]] = relationship(
+    author_messages: Mapped[typing.List["Message"]] = relationship(
         back_populates="author"
     )
 

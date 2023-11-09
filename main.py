@@ -5,6 +5,7 @@ from db.session import create_db_and_tables
 from models.user import User
 from schemas.users_schemas import UserCreate, UserRead, UserUpdate
 from auth.auth import auth_backend, current_active_user, fastapi_users
+from chat.chat import router as chat_router
 
 app = FastAPI(title="WORKERS API")
 
@@ -31,6 +32,7 @@ app.include_router(
     prefix="/users",
     tags=["users"],
 )
+app.include_router(chat_router)
 
 
 @app.get("/authenticated-route")
@@ -45,4 +47,4 @@ async def authenticated_route(user: User = Depends(current_active_user)):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", log_level="info", reload=True)

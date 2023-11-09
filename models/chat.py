@@ -6,7 +6,6 @@ from sqlalchemy import String, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base_model import BaseDBMixin, Base
-from utils.tools import change_case
 
 if typing.TYPE_CHECKING:
     from .user import User
@@ -36,7 +35,7 @@ class Chat(Base):
 
 class Message(BaseDBMixin, Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    author: Mapped[int] = relationship(back_populates="author_messages")
+    author: Mapped["User"] = relationship(back_populates="author_messages")
     text: Mapped[str] = mapped_column(String(1000))
     chat_id: Mapped[UUID] = mapped_column(ForeignKey("chat.id"))
     chat: Mapped["Chat"] = relationship(back_populates="messages")
