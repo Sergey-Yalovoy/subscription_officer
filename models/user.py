@@ -5,11 +5,13 @@ from fastapi import Depends
 from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from sqlalchemy import String
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.session import get_async_session
 from .base_model import Base, BaseDBMixin
 from .area import Area
 from .chat import Chat, Message
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class UserRole(Enum):
@@ -37,6 +39,10 @@ class User(BaseDBMixin, SQLAlchemyBaseUserTable[int], Base):
     author_messages: Mapped[typing.List["Message"]] = relationship(
         back_populates="author"
     )
+
+    @hybrid_property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):

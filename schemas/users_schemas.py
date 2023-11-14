@@ -1,23 +1,20 @@
-import typing
-from datetime import datetime, date
+from datetime import datetime
 
 from fastapi_users import schemas
-from pydantic import BaseModel
+from pydantic import ConfigDict, EmailStr, BaseModel
 
-
-class BaseUserMixin(BaseModel):
-    first_name: typing.Optional[str]
-    last_name: typing.Optional[str]
-    phone_number: typing.Optional[str]
-    sex: typing.Optional[str]
-    birth_date: typing.Optional[date]
+from .base import BaseUserMixin
 
 
 class UserRead(schemas.BaseUser[int], BaseUserMixin):
     created_at: datetime
-    # areas: typing.List
-    # chats: typing.List
-    # author_messages: typing.List
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ShortUserRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    email: EmailStr
 
 
 class UserCreate(schemas.BaseUserCreate, BaseUserMixin):
