@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import Depends, FastAPI
+from fastapi_pagination import add_pagination
 
 from db.session import create_db_and_tables
 from models.user import User
@@ -8,6 +9,7 @@ from auth.auth import auth_backend, current_active_user, fastapi_users
 from chat.chat import router as chat_router
 
 app = FastAPI(title="WORKERS API")
+add_pagination(app)
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]

@@ -1,6 +1,9 @@
+import typing
 from enum import Enum
 
 from pydantic import BaseModel
+
+from schemas.users_schemas import ShortUserRead
 
 
 class MessageType(str, Enum):
@@ -17,4 +20,6 @@ class UserRole(Enum):
 
 class WebsocketMessage(BaseModel):
     type: MessageType = MessageType.send_message
+    user: typing.Optional[ShortUserRead] = None
     message: str = ""
+    online_users: typing.Optional[typing.List[ShortUserRead]] = None
