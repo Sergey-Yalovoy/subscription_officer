@@ -1,3 +1,4 @@
+import json
 import typing
 from uuid import UUID
 
@@ -13,10 +14,14 @@ from fastapi import (
 )
 from fastapi_pagination import LimitOffsetPage
 from fastapi_users.exceptions import UserNotExists
-import json
 
-from auth.auth import get_user_manager, auth_backend, current_active_user, UserManager
-from models.chat import Chat, Message
+from auth.auth import (
+    get_user_manager,
+    current_active_user,
+    UserManager,
+    get_user_from_headers_websocket,
+)
+from models.chat import Chat
 from models.user import User
 from schemas.channel_messages import WebsocketMessage, MessageType
 from schemas.chat_schemas import ChatSchema, MessageSchema
@@ -33,33 +38,6 @@ from .crud import (
 )
 
 router = APIRouter(prefix="/chat", tags=["chat"])
-
-
-async def get_user_from_headers(
-    websocket: WebSocket, user_manager=Depends(get_user_manager)
-):
-    token = websocket.headers.get("authorization")
-    if "Bearer" in token:
-        token = token.split()[-1]
-    if not token:
-        raise WebSocketException(code=status.HTTP_403_FORBIDDEN, reason="Invalid user")
-    user = await auth_backend.get_strategy().read_token(token, user_manager)
-    if not user or not user.is_active:
-        raise WebSocketException(code=status.HTTP_403_FORBIDDEN, reason="Invalid user")
-    print(user.is_active)
-    yield user
-
-
-async def get_user_from_cookies(
-    websocket: WebSocket, user_manager=Depends(get_user_manager)
-):
-    token = websocket.cookies.get("authorization")
-    if not token:
-        raise WebSocketException(code=status.HTTP_403_FORBIDDEN, reason="Invalid user")
-    user = await auth_backend.get_strategy().read_token(token, user_manager)
-    if not user or not user.is_active:
-        raise WebSocketException(code=status.HTTP_403_FORBIDDEN, reason="Invalid user")
-    yield user
 
 
 class ConnectionManager:
@@ -176,7 +154,9 @@ async def create_chat(
 
 @router.websocket("/ws/{chat_id}")
 async def chat_websocket_endpoint(
-    websocket: WebSocket, chat_id: UUID, user: User = Depends(get_user_from_headers)
+    websocket: WebSocket,
+    chat_id: UUID,
+    user: User = Depends(get_user_from_headers_websocket),
 ):
     await manager.connect(websocket, chat_id, user)
     try:

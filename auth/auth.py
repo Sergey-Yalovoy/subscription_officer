@@ -1,7 +1,12 @@
-import uuid
 from typing import Optional
 
-from fastapi import Depends, Request
+from fastapi import Request, HTTPException
+from fastapi import (
+    WebSocket,
+    Depends,
+    WebSocketException,
+    status,
+)
 from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -12,7 +17,10 @@ from fastapi_users.authentication import (
 from fastapi_users.db import SQLAlchemyUserDatabase
 
 from config import settings
-from models.user import User, get_user_db
+from graphQL_exception.auth import AuthError
+from models.user import User
+from models.user import get_user_db
+from strawberry.exceptions import MissingQueryError
 
 SECRET = settings.secret
 
@@ -56,3 +64,26 @@ auth_backend = AuthenticationBackend(
 fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
 
 current_active_user = fastapi_users.current_user(active=True)
+
+
+async def get_user_from_headers_websocket(
+    websocket: WebSocket, user_manager=Depends(get_user_manager)
+):
+    token = websocket.headers.get("authorization")
+    if "Bearer" in token:
+        token = token.split()[-1]
+    if not token:
+        raise WebSocketException(code=status.HTTP_403_FORBIDDEN, reason="Invalid user")
+    user = await auth_backend.get_strategy().read_token(token, user_manager)
+    if not user or not user.is_active:
+        raise WebSocketException(code=status.HTTP_403_FORBIDDEN, reason="Invalid user")
+    yield user
+
+
+async def read_token_func(token: str, user_manager: UserManager) -> User:
+    if not token:
+        raise AuthError()
+    user = await auth_backend.get_strategy().read_token(token, user_manager)
+    if not user or not user.is_active:
+        raise AuthError()
+    return user

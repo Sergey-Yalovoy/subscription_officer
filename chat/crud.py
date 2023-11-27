@@ -11,7 +11,6 @@ from models.user import User
 
 
 async def get_chat_from_db(chat_id: UUID):
-    # переписать
     async with async_session_maker() as session:
         stmt = (
             select(Chat)

@@ -67,6 +67,21 @@ test = ["anyio[trio]", "coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "mock (>=
 trio = ["trio (<0.22)"]
 
 [[package]]
+name = "asyncstdlib"
+version = "3.10.9"
+description = "The missing async toolbox"
+optional = false
+python-versions = "~=3.6"
+files = [
+    {file = "asyncstdlib-3.10.9-py3-none-any.whl", hash = "sha256:2325840babe05a717ea6f03ae71a5bb7e93786e0d1df1d60aeb8069aac6746cc"},
+    {file = "asyncstdlib-3.10.9.tar.gz", hash = "sha256:c5de1bf1c60de1203a9b135058dcfea7de2507d321e56279baca0905cd8628cd"},
+]
+
+[package.extras]
+doc = ["sphinx", "sphinxcontrib-trio"]
+test = ["black", "coverage", "flake8", "flake8-2020", "flake8-bugbear", "mypy", "pytest", "pytest-cov"]
+
+[[package]]
 name = "bcrypt"
 version = "4.0.1"
 description = "Modern password hashing for your software and your servers"
@@ -1432,4 +1447,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "661032fb790483b9c8f690d9327b5edb12b26d4935f1dcc7842fe82c545b3723"
+content-hash = "16ae7686c9314b0ec97dca681cc3f427482e201b325a51c117b161c6c09868d8"

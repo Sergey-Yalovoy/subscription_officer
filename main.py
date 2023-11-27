@@ -1,15 +1,32 @@
+import strawberry
 import uvicorn
 from fastapi import Depends, FastAPI
 from fastapi_pagination import add_pagination
+from strawberry.fastapi import GraphQLRouter
 
 from db.session import create_db_and_tables
+from graphql_schemas.context import Context
+from graphql_schemas.mutation import Mutation
+from graphql_schemas.query import Query
 from models.user import User
 from schemas.users_schemas import UserCreate, UserRead, UserUpdate
-from auth.auth import auth_backend, current_active_user, fastapi_users
+from auth.auth import auth_backend, current_active_user, fastapi_users, get_user_manager
 from chat.chat import router as chat_router
 
 app = FastAPI(title="WORKERS API")
 add_pagination(app)
+
+
+async def get_context(user_manager=Depends(get_user_manager)) -> Context:
+    return Context(user_manager)
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)
+
+graphql_app = GraphQLRouter(
+    schema,
+    context_getter=get_context,
+)
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
@@ -35,6 +52,7 @@ app.include_router(
     tags=["users"],
 )
 app.include_router(chat_router)
+app.include_router(graphql_app, prefix="/graphql")
 
 
 @app.get("/authenticated-route")
